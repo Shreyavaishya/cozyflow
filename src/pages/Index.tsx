@@ -44,7 +44,7 @@ const Index = () => {
             transition={{ duration: 0.3 }}
           >
             <h1 className="text-xl font-serif font-semibold text-foreground flex items-center gap-2">
-              🍅 Cozy Pomodoro
+              🍅 Cozy Flow
             </h1>
             <div className="flex items-center gap-2">
               <motion.button

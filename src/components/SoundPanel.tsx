@@ -5,7 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { useStore } from '@/store/useStore';
 
 const sounds = [
-  { id: 'rain', label: 'Rain', icon: CloudRain, url: 'https://cdn.freesound.org/previews/531/531947_6364864-lq.mp3' },
+  { id: 'rain', label: 'Rain', icon: CloudRain, url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3' },
   { id: 'cafe', label: 'Café', icon: Coffee, url: 'https://cdn.freesound.org/previews/424/424899_5765668-lq.mp3' },
   { id: 'fire', label: 'Fire', icon: Flame, url: 'https://cdn.freesound.org/previews/277/277021_3284006-lq.mp3' },
   { id: 'white', label: 'White', icon: Radio, url: 'https://cdn.freesound.org/previews/629/629627_13982855-lq.mp3' },

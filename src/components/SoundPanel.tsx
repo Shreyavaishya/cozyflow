@@ -1,15 +1,30 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, CloudRain, Coffee, Flame, Radio } from 'lucide-react';
+import { Volume2, CloudRain, Coffee, Flame, Radio, Trees } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useStore } from '@/store/useStore';
 
 const sounds = [
-  { id: 'rain', label: 'Rain', icon: CloudRain, url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3' },
-  { id: 'cafe', label: 'Café', icon: Coffee, url: 'https://cdn.freesound.org/previews/424/424899_5765668-lq.mp3' },
-  { id: 'fire', label: 'Fire', icon: Flame, url: 'https://cdn.freesound.org/previews/277/277021_3284006-lq.mp3' },
-  { id: 'white', label: 'White', icon: Radio, url: 'https://cdn.freesound.org/previews/629/629627_13982855-lq.mp3' },
+  {
+    id: "rain",
+    label: "Rain",
+    icon: CloudRain,
+    url: "/sounds/rain.mp3",
+  },
+  {
+    id: "forest",
+    label: "forest",
+    icon: Trees,
+    url: "/sounds/forest.mp3",
+  },
+  {
+    id: "fire",
+    label: "Fire",
+    icon: Flame,
+    url: "/sounds/fire.mp3",
+  },
 ];
+
 
 const SoundPanel = () => {
   const { activeSound, setActiveSound, soundVolume, setSoundVolume, settings } = useStore();
@@ -70,7 +85,7 @@ const SoundPanel = () => {
         <Volume2 size={16} />
         Ambient Sounds
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {sounds.map(({ id, label, icon: Icon }) => (
           <motion.button
             key={id}
@@ -81,7 +96,7 @@ const SoundPanel = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Icon size={18} />
+            <Icon size={20} />
             {label}
           </motion.button>
         ))}

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, CloudRain, Coffee, Flame, Radio } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
@@ -15,27 +15,50 @@ const SoundPanel = () => {
   const { activeSound, setActiveSound, soundVolume, setSoundVolume, settings } = useStore();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    if (!settings.soundEnabled || !activeSound) {
-      audioRef.current?.pause();
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
       audioRef.current = null;
-      return;
     }
+  }, []);
 
-    const sound = sounds.find(s => s.id === activeSound);
+  const playAudio = useCallback((soundId: string) => {
+    stopAudio();
+    const sound = sounds.find(s => s.id === soundId);
     if (!sound) return;
 
+    // Create and play synchronously within the user gesture
     const audio = new Audio(sound.url);
     audio.loop = true;
     audio.volume = soundVolume;
-    audio.play().catch(() => {});
+    audio.play().catch(console.warn);
     audioRef.current = audio;
+  }, [soundVolume, stopAudio]);
 
-    return () => {
-      audio.pause();
-      audio.src = '';
-    };
-  }, [activeSound, settings.soundEnabled]);
+  const handleToggle = useCallback((id: string) => {
+    if (activeSound === id) {
+      stopAudio();
+      setActiveSound(null);
+    } else {
+      if (settings.soundEnabled) {
+        playAudio(id);
+      }
+      setActiveSound(id);
+    }
+  }, [activeSound, settings.soundEnabled, playAudio, stopAudio, setActiveSound]);
+
+  // Stop audio when sound is disabled in settings
+  useEffect(() => {
+    if (!settings.soundEnabled) {
+      stopAudio();
+    }
+  }, [settings.soundEnabled, stopAudio]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopAudio();
+  }, [stopAudio]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = soundVolume;
@@ -51,7 +74,7 @@ const SoundPanel = () => {
         {sounds.map(({ id, label, icon: Icon }) => (
           <motion.button
             key={id}
-            onClick={() => setActiveSound(activeSound === id ? null : id)}
+            onClick={() => handleToggle(id)}
             className={`flex flex-col items-center gap-1 p-2 rounded-xl text-xs transition-colors ${
               activeSound === id ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}

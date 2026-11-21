@@ -48,7 +48,7 @@ const SettingsModal = ({ open, onOpenChange }: Props) => {
     { key: 'autoStartBreaks' as const, label: 'Auto-start breaks' },
     { key: 'autoStartSessions' as const, label: 'Auto-start focus sessions' },
     { key: 'soundEnabled' as const, label: 'Sounds' },
-    { key: 'cursorEnabled' as const, label: 'Custom cursor' },
+    { key: 'cursorGlow' as const, label: 'Cursor glow (decorative)' },
     { key: 'notificationsEnabled' as const, label: 'Browser notifications' },
   ];
 

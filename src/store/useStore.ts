@@ -40,7 +40,7 @@ interface Settings {
   longBreakDuration: number;
   autoStartBreaks: boolean;
   autoStartSessions: boolean;
-  cursorEnabled: boolean;
+  cursorGlow: boolean; // optional decorative glow; never replaces the native cursor
   soundEnabled: boolean;
   backgroundIntensity: number;
   notificationsEnabled: boolean;
@@ -146,6 +146,17 @@ const getDuration = (mode: TimerMode, settings: Settings) => {
   }
 };
 
+// Data saved by older app versions. Loosely typed on purpose: it is upgraded field by field in `migrate`.
+interface LegacyPersisted {
+  stats?: { totalSessions?: number; dailyHistory?: { date: string; count: number }[] };
+  tasks?: Partial<Task>[];
+  settings?: Record<string, unknown> & { focusDuration?: number };
+  countdowns?: Countdown[];
+  activeSound?: unknown;
+  soundVolume?: unknown;
+  [key: string]: unknown;
+}
+
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
@@ -185,7 +196,7 @@ export const useStore = create<StoreState>()(
         longBreakDuration: 15,
         autoStartBreaks: false,
         autoStartSessions: false,
-        cursorEnabled: true,
+        cursorGlow: false,
         scene: 'default',
         chime: 'bell',
         fontStyle: 'modern',
@@ -265,25 +276,28 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'cozy-pomodoro-storage',
-      version: 5,
-      migrate: (persisted: any, version) => {
+      version: 6,
+      migrate: (persistedState, version) => {
+        const persisted = persistedState as LegacyPersisted | null;
         if (version < 2 && persisted) {
           const old = persisted.stats ?? {};
           const focus = persisted.settings?.focusDuration ?? 25;
-          const history = (old.dailyHistory ?? []).map((h: any) => ({ date: h.date, count: h.count, minutes: h.count * focus }));
+          const history = (old.dailyHistory ?? []).map(h => ({ date: h.date, count: h.count, minutes: h.count * focus }));
           persisted.stats = {
             totalSessions: old.totalSessions ?? 0,
             totalMinutes: (old.totalSessions ?? 0) * focus,
             dailyHistory: history,
-          };
-          persisted.tasks = (persisted.tasks ?? []).map((t: any) => ({ ...t, pomodoros: t.pomodoros ?? 0 }));
+          } as LegacyPersisted['stats'];
+          persisted.tasks = (persisted.tasks ?? []).map(t => ({ ...t, pomodoros: t.pomodoros ?? 0 }));
         }
         if (persisted) {
-          delete persisted.activeSound; delete persisted.soundVolume;
-          persisted.settings = { scene: 'default', chime: 'bell', fontStyle: 'modern', accent: 'terracotta', ...(persisted.settings ?? {}) };
+          delete persisted.activeSound;
+          delete persisted.soundVolume;
+          persisted.settings = { scene: 'default', chime: 'bell', fontStyle: 'modern', accent: 'terracotta', cursorGlow: false, ...(persisted.settings ?? {}) };
+          delete persisted.settings.cursorEnabled; // old custom-cursor flag, no longer used
           persisted.countdowns = persisted.countdowns ?? [];
         }
-        return persisted;
+        return persisted as unknown as StoreState;
       },
       partialize: (state) => ({
         theme: state.theme,

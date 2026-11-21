@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ---------- Font styles (set via <html data-font>) ---------- */
+  :root {
+    --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --timer-weight: 300;
+    --timer-tracking: -0.04em;
+  }
+  html[data-font='grotesk'] {
+    --font-body: 'Space Grotesk Variable', system-ui, sans-serif;
+    --font-display: 'Space Grotesk Variable', system-ui, sans-serif;
+    --timer-weight: 400;
+    --timer-tracking: -0.03em;
+  }
+  html[data-font='rounded'] {
+    --font-body: 'Manrope Variable', system-ui, sans-serif;
+    --font-display: 'Manrope Variable', system-ui, sans-serif;
+    --timer-weight: 500;
+    --timer-tracking: -0.03em;
+  }
+  html[data-font='mono'] {
+    --font-body: 'Inter Variable', system-ui, sans-serif;
+    --font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
+    --timer-weight: 400;
+    --timer-tracking: -0.04em;
+  }
+  html[data-font='classic'] {
+    --font-body: 'DM Sans Variable', system-ui, sans-serif;
+    --font-display: 'Fraunces Variable', Georgia, serif;
+    --timer-weight: 700;
+    --timer-tracking: 0;
+  }
+
+  /* ---------- Accent colors (set via <html data-accent>) ---------- */
+  html[data-accent='sage']      { --primary: 150 28% 42%; --timer-glow: 150 35% 55%; }
+  html.dark[data-accent='sage'] { --primary: 150 35% 55%; --timer-glow: 150 35% 40%; }
+  html[data-accent='ocean']      { --primary: 205 55% 45%; --timer-glow: 205 65% 58%; }
+  html.dark[data-accent='ocean'] { --primary: 205 70% 60%; --timer-glow: 205 70% 45%; }
+  html[data-accent='lavender']      { --primary: 262 40% 55%; --timer-glow: 262 50% 66%; }
+  html.dark[data-accent='lavender'] { --primary: 262 55% 68%; --timer-glow: 262 50% 52%; }
+  html[data-accent='rose']      { --primary: 345 55% 52%; --timer-glow: 345 65% 64%; }
+  html.dark[data-accent='rose'] { --primary: 345 65% 65%; --timer-glow: 345 60% 50%; }
+  html[data-accent='amber']      { --primary: 32 85% 44%; --timer-glow: 38 90% 58%; }
+  html.dark[data-accent='amber'] { --primary: 40 90% 58%; --timer-glow: 40 85% 45%; }
+  html[data-accent='graphite']      { --primary: 220 8% 30%; --timer-glow: 220 8% 50%; }
+  html.dark[data-accent='graphite'] { --primary: 220 10% 82%; --timer-glow: 220 8% 60%; }
+
+  :root {
+    --background: 30 25% 95%;
+    --foreground: 25 20% 15%;
+
+    --card: 30 20% 92%;
+    --card-foreground: 25 20% 15%;
+
+    --popover: 30 20% 92%;
+    --popover-foreground: 25 20% 15%;
+
+    --primary: 16 50% 52%;
+    --primary-foreground: 30 25% 97%;
+
+    --secondary: 30 15% 85%;
+    --secondary-foreground: 25 20% 25%;
+
+    --muted: 30 12% 88%;
+    --muted-foreground: 25 10% 45%;
+
+    --accent: 20 60% 80%;
+    --accent-foreground: 25 20% 15%;
+
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 30 25% 97%;
+
+    --border: 30 15% 85%;
+    --input: 30 15% 85%;
+    --ring: 16 50% 52%;
+
+    --radius: 1rem;
+
+    --timer-glow: 16 60% 60%;
+    --blob-1: 16 55% 65%;
+    --blob-2: 30 40% 70%;
+    --blob-3: 340 35% 70%;
+
+    --glass: 30 20% 96% / 0.6;
+    --glass-border: 30 20% 90% / 0.4;
+
+    --sidebar-background: 30 20% 93%;
+    --sidebar-foreground: 25 20% 20%;
+    --sidebar-primary: 16 50% 52%;
+    --sidebar-primary-foreground: 30 25% 97%;
+    --sidebar-accent: 30 15% 88%;
+    --sidebar-accent-foreground: 25 20% 20%;
+    --sidebar-border: 30 15% 85%;
+    --sidebar-ring: 16 50% 52%;
+  }
+
+  .dark {
+    --background: 25 15% 10%;
+    --foreground: 30 15% 88%;
+
+    --card: 25 15% 13%;
+    --card-foreground: 30 15% 88%;
+
+    --popover: 25 15% 13%;
+    --popover-foreground: 30 15% 88%;
+
+    --primary: 30 70% 55%;
+    --primary-foreground: 25 15% 8%;
+
+    --secondary: 25 12% 18%;
+    --secondary-foreground: 30 15% 80%;
+
+    --muted: 25 10% 18%;
+    --muted-foreground: 30 10% 55%;
+
+    --accent: 30 50% 30%;
+    --accent-foreground: 30 15% 88%;
+
+    --destructive: 0 50% 35%;
+    --destructive-foreground: 30 15% 88%;
+
+    --border: 25 12% 20%;
+    --input: 25 12% 20%;
+    --ring: 30 70% 55%;
+
+    --timer-glow: 30 70% 45%;
+    --blob-1: 30 50% 25%;
+    --blob-2: 20 35% 20%;
+    --blob-3: 340 25% 20%;
+
+    --glass: 25 15% 15% / 0.6;
+    --glass-border: 25 12% 25% / 0.4;
+
+    --sidebar-background: 25 15% 8%;
+    --sidebar-foreground: 30 15% 85%;
+    --sidebar-primary: 30 70% 55%;
+    --sidebar-primary-foreground: 25 15% 8%;
+    --sidebar-accent: 25 12% 15%;
+    --sidebar-accent-foreground: 30 15% 85%;
+    --sidebar-border: 25 12% 18%;
+    --sidebar-ring: 30 70% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@keyframes scene-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+  100% { transform: translate3d(var(--sway, 40px), 110vh, 0) rotate(var(--spin, 360deg)); }
+}
+@keyframes scene-rise {
+  0% { transform: translate3d(0, 105vh, 0) scale(1); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate3d(var(--sway, 30px), -10vh, 0) scale(0.4); opacity: 0; }
+}
+@keyframes scene-twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+@keyframes scene-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(var(--sway, 20px), -30px, 0); }
+}
+@keyframes scene-glow { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+@keyframes scene-drift {
+  0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
+  100% { background-position: 30% 20%, 70% 30%, 40% 80%, 0 0; }
+}
+.scene-particle { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .scene-particle, .scene-bg { animation: none !important; }
+}
+
+@layer utilities {
+  .timer-digits {
+    font-weight: var(--timer-weight);
+    letter-spacing: var(--timer-tracking);
+    font-variant-numeric: tabular-nums;
+  }
+  .glass-panel {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .timer-glow {
+    box-shadow: 0 0 60px 20px hsl(var(--timer-glow) / 0.15),
+                0 0 120px 40px hsl(var(--timer-glow) / 0.08);
+  }
+
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px;
+  }
+}

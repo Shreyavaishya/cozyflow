@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { supabase, cloudEnabled } from '@/lib/supabase';
+import { supabase, cloudEnabled, isGoogleEnabled } from '@/lib/supabase';
 import type { useCloudSync } from '@/hooks/useCloudSync';
 
 type Props = ReturnType<typeof useCloudSync>;
@@ -13,6 +13,12 @@ const AccountButton = ({ session, status, errorMsg }: Props) => {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [googleOk, setGoogleOk] = useState(false);
+
+  // Only offer Google once it is switched on in Supabase, so nobody lands on an error page.
+  useEffect(() => {
+    if (open && !session && cloudEnabled) isGoogleEnabled().then(setGoogleOk);
+  }, [open, session]);
 
   if (!cloudEnabled) return null;
 
@@ -86,9 +92,11 @@ const AccountButton = ({ session, status, errorMsg }: Props) => {
                   >
                     {busy ? 'Sending…' : 'Email me a magic link'}
                   </button>
-                  <button onClick={google} className="w-full rounded-xl bg-muted px-4 py-2 text-sm hover:bg-muted/70">
-                    Continue with Google
-                  </button>
+                  {googleOk && (
+                    <button onClick={google} className="w-full rounded-xl bg-muted px-4 py-2 text-sm hover:bg-muted/70">
+                      Continue with Google
+                    </button>
+                  )}
                   {err && <p className="text-xs text-destructive">{err}</p>}
                 </div>
               )}

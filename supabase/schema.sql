@@ -1,4 +1,7 @@
--- Run this once in Supabase: SQL Editor -> New query -> paste -> Run
+-- Safe to run more than once. Every statement is idempotent (tables use IF NOT EXISTS,
+-- policies are dropped and recreated, functions use CREATE OR REPLACE, grants can repeat).
+-- Run the WHOLE file in Supabase > SQL Editor after every update of the app.
+
 
 create table if not exists public.user_data (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -8,10 +11,13 @@ create table if not exists public.user_data (
 
 alter table public.user_data enable row level security;
 
+drop policy if exists "read own data" on public.user_data;
 create policy "read own data" on public.user_data
   for select using (auth.uid() = user_id);
+drop policy if exists "insert own data" on public.user_data;
 create policy "insert own data" on public.user_data
   for insert with check (auth.uid() = user_id);
+drop policy if exists "update own data" on public.user_data;
 create policy "update own data" on public.user_data
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -24,6 +30,7 @@ create table if not exists public.subscriptions (
   updated_at timestamptz not null default now()
 );
 alter table public.subscriptions enable row level security;
+drop policy if exists "read own subscription" on public.subscriptions;
 create policy "read own subscription" on public.subscriptions
   for select using (auth.uid() = user_id);
 -- no insert/update policy on purpose: users cannot grant themselves Pro
@@ -37,6 +44,7 @@ create table if not exists public.payments (
   created_at timestamptz not null default now()
 );
 alter table public.payments enable row level security;
+drop policy if exists "read own payments" on public.payments;
 create policy "read own payments" on public.payments
   for select using (auth.uid() = user_id);
 
@@ -54,6 +62,7 @@ create table if not exists public.sponsors (
   created_at timestamptz not null default now()
 );
 alter table public.sponsors enable row level security;
+drop policy if exists "public reads live sponsors" on public.sponsors;
 create policy "public reads live sponsors" on public.sponsors
   for select using (
     active
@@ -69,6 +78,7 @@ create table if not exists public.sponsor_events (
   created_at timestamptz not null default now()
 );
 alter table public.sponsor_events enable row level security;
+drop policy if exists "anyone can log events" on public.sponsor_events;
 create policy "anyone can log events" on public.sponsor_events
   for insert to anon, authenticated with check (true);
 -- no select policy: only you can read events (dashboard / service role)
@@ -116,12 +126,16 @@ create table if not exists public.leaderboard_profiles (
 );
 create unique index if not exists leaderboard_name_unique on public.leaderboard_profiles (lower(display_name));
 alter table public.leaderboard_profiles enable row level security;
+drop policy if exists "read own leaderboard profile" on public.leaderboard_profiles;
 create policy "read own leaderboard profile" on public.leaderboard_profiles
   for select using (auth.uid() = user_id);
+drop policy if exists "join leaderboard" on public.leaderboard_profiles;
 create policy "join leaderboard" on public.leaderboard_profiles
   for insert with check (auth.uid() = user_id);
+drop policy if exists "rename on leaderboard" on public.leaderboard_profiles;
 create policy "rename on leaderboard" on public.leaderboard_profiles
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "leave leaderboard" on public.leaderboard_profiles;
 create policy "leave leaderboard" on public.leaderboard_profiles
   for delete using (auth.uid() = user_id);
 
@@ -201,3 +215,6 @@ $$;
 
 revoke all on function public.apply_payment(text, text, uuid, text, integer, integer) from public, anon, authenticated;
 grant execute on function public.apply_payment(text, text, uuid, text, integer, integer) to service_role;
+
+-- Make the API pick up new tables and functions immediately (fixes "function ... not found in the schema cache").
+notify pgrst, 'reload schema';

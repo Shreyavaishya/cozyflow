@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase, cloudEnabled, isGoogleEnabled } from '@/lib/supabase';
+import { friendlyAuthError } from '@/lib/authErrors';
 import type { useCloudSync } from '@/hooks/useCloudSync';
 
 type Props = ReturnType<typeof useCloudSync>;
@@ -30,7 +31,7 @@ const AccountButton = ({ session, status, errorMsg }: Props) => {
       options: { emailRedirectTo: window.location.origin },
     });
     setBusy(false);
-    if (error) setErr(error.message); else setSent(true);
+    if (error) setErr(friendlyAuthError(error.message, googleOk)); else setSent(true);
   };
 
   const google = () =>

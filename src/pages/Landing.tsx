@@ -364,36 +364,53 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 md:items-start md:justify-between">
-          <div className="max-w-xs">
-            <p className="font-serif text-lg font-semibold">🍅 Cozy Flow</p>
-            <p className="mt-2 text-sm text-muted-foreground">A calm Pomodoro timer, built by an independent developer.</p>
-          </div>
-          <div className="flex gap-14 text-sm">
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Product</span>
-              <a href="#features" className="text-muted-foreground hover:text-foreground">Features</a>
-              <a href="#themes" className="text-muted-foreground hover:text-foreground">Themes</a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground">Pricing</a>
-              <a href="#faq" className="text-muted-foreground hover:text-foreground">FAQ</a>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Cozy Flow</span>
-              <Link to="/app" className="text-muted-foreground hover:text-foreground">Open app</Link>
-              <Link to="/sponsor" className="text-muted-foreground hover:text-foreground">Sponsor us</Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Legal</span>
-              <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
-              <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
-              <Link to="/refund" className="text-muted-foreground hover:text-foreground">Refunds</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-xs text-muted-foreground pb-8">© {new Date().getFullYear()} Cozy Flow</p>
-      </footer>
+
+    <footer className="border-t border-border">
+      <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 md:items-start md:justify-between">
+        <div className="max-w-xs">
+          <p className="font-serif text-lg font-semibold">🍅 Cozy Flow</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A calm Pomodoro timer, made with ❤️ by{" "}
+          <a
+          href="https://shreyacodes.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium hover:text-foreground transition-colors"
+        >
+          Shreya
+        </a>.
+      </p>
+    </div>
+
+    <div className="flex gap-14 text-sm">
+      <div className="flex flex-col gap-2">
+        <span className="font-medium">Product</span>
+        <a href="#features" className="text-muted-foreground hover:text-foreground">Features</a>
+        <a href="#themes" className="text-muted-foreground hover:text-foreground">Themes</a>
+        <a href="#pricing" className="text-muted-foreground hover:text-foreground">Pricing</a>
+        <a href="#faq" className="text-muted-foreground hover:text-foreground">FAQ</a>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="font-medium">Cozy Flow</span>
+        <Link to="/app" className="text-muted-foreground hover:text-foreground">Open app</Link>
+        <Link to="/sponsor" className="text-muted-foreground hover:text-foreground">Sponsor us</Link>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="font-medium">Legal</span>
+        <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+        <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
+        <Link to="/refund" className="text-muted-foreground hover:text-foreground">Refunds</Link>
+        <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
+      </div>
+    </div>
+  </div>
+
+  <p className="text-center text-xs text-muted-foreground pb-8">
+    © {new Date().getFullYear()} Cozy Flow
+  </p>
+</footer>
     </div>
   );
 };

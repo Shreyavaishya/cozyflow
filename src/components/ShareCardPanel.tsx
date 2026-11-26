@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Copy, Download, Share2 } from 'lucide-react';
-import { useStore, toDateKey, getStreak, getSessionsThisWeek } from '@/store/useStore';
+import { useStore, toDateKey, getSessionsThisWeek } from '@/store/useStore';
+import { useStreak } from '@/hooks/useStreak';
 import { renderShareCardBlob, ShareData } from '@/lib/shareCard';
 import { fmtFocus } from '@/lib/format';
 import { SITE_HOST, SITE_URL } from '@/lib/site';
@@ -10,6 +11,7 @@ const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 const ShareCardPanel = () => {
   const history = useStore(s => s.stats.dailyHistory);
   const totalMinutes = useStore(s => s.stats.totalMinutes);
+  const { streak } = useStreak();
   const [blob, setBlob] = useState<Blob | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
@@ -20,14 +22,14 @@ const ShareCardPanel = () => {
     const weekMinutes = Array.from({ length: 7 }, (_, i) => byDate.get(toDateKey(new Date(Date.now() - i * day)))?.minutes ?? 0)
       .reduce((a, b) => a + b, 0);
     return {
-      streak: getStreak(history),
+      streak,
       weekFocus: fmtFocus(weekMinutes),
       weekSessions: getSessionsThisWeek(history),
       totalFocus: fmtFocus(totalMinutes),
       last35: Array.from({ length: 35 }, (_, i) => byDate.get(toDateKey(new Date(Date.now() - (34 - i) * day)))?.count ?? 0),
       host: SITE_HOST,
     };
-  }, [history, totalMinutes]);
+  }, [history, totalMinutes, streak]);
 
   const hasActivity = history.some(h => h.count > 0);
 
@@ -85,8 +87,8 @@ const ShareCardPanel = () => {
     const file = new File([blob], 'cozy-flow-streak.png', { type: 'image/png' });
     try {
       await navigator.share({ files: [file], text: `${caption} ${SITE_URL}` });
-    } catch (e: any) {
-      if (e?.name !== 'AbortError') { download(); await copyCaption(); setMsg('Sharing is not available here. Image downloaded and caption copied.'); }
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) { download(); await copyCaption(); setMsg('Sharing is not available here. Image downloaded and caption copied.'); }
     }
   };
 

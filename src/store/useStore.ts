@@ -41,6 +41,7 @@ interface Settings {
   autoStartBreaks: boolean;
   autoStartSessions: boolean;
   cursorGlow: boolean; // optional decorative glow; never replaces the native cursor
+  dailyGoalMinutes: number; // minutes of focus to aim for each day
   soundEnabled: boolean;
   backgroundIntensity: number;
   notificationsEnabled: boolean;
@@ -125,17 +126,64 @@ export const getSessionsThisWeek = (history: SessionRecord[]) => {
   return history.filter(h => keys.has(h.date)).reduce((a, h) => a + h.count, 0);
 };
 
-// Streak is derived from history so it resets correctly when a day is missed.
-export const getStreak = (history: SessionRecord[]) => {
+export interface StreakInfo {
+  streak: number;       // days with at least one session in the chain
+  frozenDays: string[]; // missed days that a streak freeze bridged (never includes trailing days)
+}
+
+const DAY_MS = 86400000;
+
+/**
+ * Streak = consecutive days with at least one session. Derived from history, so a missed day breaks it.
+ *
+ * With `freeze` (a Pro perk) one missed day does not break the streak, at most once in any 7-day window.
+ * It is computed only from history, so there is nothing extra to store or sync and every device agrees.
+ * A bridged day only counts if an earlier session day follows it, and it never adds to the streak number.
+ */
+export const getStreakInfo = (history: SessionRecord[], freeze = false): StreakInfo => {
   const days = new Set(history.filter(h => h.count > 0).map(h => h.date));
   let cursor = new Date();
-  if (!days.has(toDateKey(cursor))) cursor = new Date(Date.now() - 86400000); // today not done yet: don't break
+  if (!days.has(toDateKey(cursor))) cursor = new Date(cursor.getTime() - DAY_MS); // today not done yet: don't break
+
   let streak = 0;
-  while (days.has(toDateKey(cursor))) {
-    streak++;
-    cursor = new Date(cursor.getTime() - 86400000);
+  let frozenDays: string[] = [];
+  let pending: string[] = [];      // bridged days waiting for an earlier session day to connect to
+  let sinceFreeze = Infinity;      // days walked back since the last bridged day
+
+  for (let i = 0; i < 800; i++) {
+    const key = toDateKey(cursor);
+    if (days.has(key)) {
+      streak++;
+      frozenDays = frozenDays.concat(pending);
+      pending = [];
+    } else if (freeze && sinceFreeze >= 7) {
+      pending.push(key);
+      sinceFreeze = 0;
+    } else {
+      break;
+    }
+    cursor = new Date(cursor.getTime() - DAY_MS);
+    sinceFreeze++;
   }
-  return streak;
+  return { streak, frozenDays };
+};
+
+export const getStreak = (history: SessionRecord[], freeze = false) => getStreakInfo(history, freeze).streak;
+
+export const getMinutesToday = (history: SessionRecord[]) =>
+  history.find(h => h.date === getToday())?.minutes ?? 0;
+
+export interface GoalProgress {
+  minutes: number;
+  goal: number;
+  ratio: number; // 0 to 1
+  reached: boolean;
+}
+
+export const getGoalProgress = (history: SessionRecord[], goalMinutes: number): GoalProgress => {
+  const goal = Math.max(1, Math.round(goalMinutes || 0));
+  const minutes = getMinutesToday(history);
+  return { minutes, goal, ratio: Math.min(1, minutes / goal), reached: minutes >= goal };
 };
 
 const getDuration = (mode: TimerMode, settings: Settings) => {
@@ -197,6 +245,7 @@ export const useStore = create<StoreState>()(
         autoStartBreaks: false,
         autoStartSessions: false,
         cursorGlow: false,
+        dailyGoalMinutes: 60,
         scene: 'default',
         chime: 'bell',
         fontStyle: 'modern',
@@ -276,7 +325,7 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'cozy-pomodoro-storage',
-      version: 6,
+      version: 7,
       migrate: (persistedState, version) => {
         const persisted = persistedState as LegacyPersisted | null;
         if (version < 2 && persisted) {
@@ -293,7 +342,7 @@ export const useStore = create<StoreState>()(
         if (persisted) {
           delete persisted.activeSound;
           delete persisted.soundVolume;
-          persisted.settings = { scene: 'default', chime: 'bell', fontStyle: 'modern', accent: 'terracotta', cursorGlow: false, ...(persisted.settings ?? {}) };
+          persisted.settings = { scene: 'default', chime: 'bell', fontStyle: 'modern', accent: 'terracotta', cursorGlow: false, dailyGoalMinutes: 60, ...(persisted.settings ?? {}) };
           delete persisted.settings.cursorEnabled; // old custom-cursor flag, no longer used
           persisted.countdowns = persisted.countdowns ?? [];
         }

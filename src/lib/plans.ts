@@ -7,6 +7,7 @@ export const PLANS: Record<PlanId, { label: string; price: number; period: strin
 };
 
 export const PRO_FEATURES = [
+  'Weekly streak freeze: a missed day will not break your streak',
   'Focus heatmap and full history',
   'Extra ambient sounds (brown and white noise)',
   'All aesthetic scenes (Fireplace, Academia, Sunrise and more)',

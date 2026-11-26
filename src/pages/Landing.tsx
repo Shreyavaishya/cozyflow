@@ -34,7 +34,7 @@ const FEATURES = [
 const FREE_FEATURES = [
   'Timer with custom lengths (1 to 180 min)',
   'Rain, forest and fire sounds',
-  'Tasks, streaks and weekly chart',
+  'Tasks, daily goal, streaks and weekly chart',
   'Leaderboard and share cards',
   'Cloud sync across devices',
   '1 countdown, 3 accent colors',
@@ -411,4 +411,6 @@ const Landing = () => {
 };
 
 export default Landing;
-
+            
+      
+ 

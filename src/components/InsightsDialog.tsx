@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { BarChart3, Lock } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import { useStore, toDateKey, getStreak } from '@/store/useStore';
+import { useStore, toDateKey } from '@/store/useStore';
+import { useStreak } from '@/hooks/useStreak';
 import { useProStore } from '@/store/useProStore';
 import ShareCardPanel from '@/components/ShareCardPanel';
 import { fmtFocus } from '@/lib/format';
@@ -14,6 +15,7 @@ const InsightsDialog = () => {
   const history = useStore(s => s.stats.dailyHistory);
   const totalMinutes = useStore(s => s.stats.totalMinutes);
   const { isPro, openUpgrade } = useProStore();
+  const { streak } = useStreak();
 
   const { week, cells, best, longest } = useMemo(() => {
     const byDate = new Map(history.map(h => [h.date, h]));
@@ -66,7 +68,7 @@ const InsightsDialog = () => {
         <DialogHeader>
           <DialogTitle>Your focus insights</DialogTitle>
           <DialogDescription>
-            {fmtFocus(totalMinutes)} focused in total · current streak {getStreak(history)}d · longest {longest}d
+            {fmtFocus(totalMinutes)} focused in total · current streak {streak}d · longest {Math.max(longest, streak)}d
             {best.count > 0 && ` · best day ${best.count} sessions`}
           </DialogDescription>
         </DialogHeader>

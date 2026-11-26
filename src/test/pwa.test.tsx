@@ -130,10 +130,10 @@ describe('update prompt', () => {
   });
 
   it('warns that reloading restarts a running timer', () => {
-    useStore.setState({ isRunning: true });
+    act(() => { useStore.setState({ isRunning: true }); });
     render(<UpdateToast />);
     act(() => __setUpdateReadyForTests(true));
     expect(screen.getByText(/restarts your running timer/)).toBeTruthy();
-    useStore.setState({ isRunning: false });
+    act(() => { useStore.setState({ isRunning: false }); });
   });
 });

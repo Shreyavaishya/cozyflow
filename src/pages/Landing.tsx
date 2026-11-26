@@ -11,6 +11,7 @@ import { PLANS, PRO_FEATURES } from '@/lib/plans';
 import { SCENES } from '@/lib/scenes';
 import { SITE_URL } from '@/lib/site';
 import SocialProof from '@/components/SocialProof';
+import InstallButton from '@/components/InstallButton';
 
 const NAV = [
   { label: 'Features', href: '#features' },
@@ -74,6 +75,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <InstallButton />
             <button onClick={toggleTheme} aria-label="Toggle theme" className="p-2 rounded-xl text-muted-foreground hover:text-foreground">
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
@@ -409,3 +411,4 @@ const Landing = () => {
 };
 
 export default Landing;
+

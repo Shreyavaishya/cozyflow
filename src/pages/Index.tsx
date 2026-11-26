@@ -21,6 +21,7 @@ import SponsorCard from '@/components/SponsorCard';
 import CountdownPanel from '@/components/CountdownPanel';
 import LeaderboardDialog from '@/components/LeaderboardDialog';
 import SceneToggle from '@/components/SceneToggle';
+import InstallButton from '@/components/InstallButton';
 
 const Index = () => {
   const { theme, toggleTheme, focusModeActive, setFocusMode } = useStore();
@@ -33,8 +34,8 @@ const Index = () => {
     if (q.get('upgrade')) openUpgrade();
     const scene = q.get('scene');
     if (scene && SCENES.some(sc => sc.id === scene && !sc.pro)) useStore.getState().updateSettings({ scene: scene as SceneId });
-  }, []);
-  useEffect(() => { if (cloud.authReady) loadPro(cloud.session?.user.id ?? null); }, [cloud.session, cloud.authReady]);
+  }, [openUpgrade]); // store actions are stable, so this still runs once
+  useEffect(() => { if (cloud.authReady) loadPro(cloud.session?.user.id ?? null); }, [cloud.session, cloud.authReady, loadPro]);
 
   // Apply theme on mount
   useEffect(() => {
@@ -76,6 +77,7 @@ const Index = () => {
               >
                 <Crown size={14} /> {isPro ? 'Pro' : 'Go Pro'}
               </motion.button>
+              <InstallButton />
               <SceneToggle />
               <LeaderboardDialog session={cloud.session} />
               <InsightsDialog />

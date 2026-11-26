@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import Embed from "./pages/Embed";
 import { Privacy, Terms, Refund, Contact } from "./pages/Legal";
 import Appearance from "./components/Appearance";
+import UpdateToast from "./components/UpdateToast";
 import SponsorPage from "./pages/Sponsor";
 import NotFound from "./pages/NotFound";
 
@@ -20,6 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Appearance />
+        <UpdateToast />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/app" element={<Index />} />

@@ -60,6 +60,24 @@ export default defineConfig(({ mode }) => ({
       devOptions: { enabled: false },
     }),
   ].filter(Boolean),
+  build: {
+    rollupOptions: {
+      output: {
+        // Libraries every page needs get their own long-lived files, so a deploy that only changes our code
+        // does not make returning visitors download React, animation and Supabase again.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          // tslib is used by both Supabase and the dialog library. Left alone, the build parks it inside the
+          // Supabase file, so every page with a dialog would download all of Supabase. Its own tiny file avoids that.
+          if (id.includes("node_modules/tslib/")) return "vendor-tslib";
+          if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return "vendor-react";
+          if (/node_modules\/(react-router|react-router-dom|@remix-run)\//.test(id)) return "vendor-router";
+          if (/node_modules\/(framer-motion|motion-dom|motion-utils)\//.test(id)) return "vendor-motion";
+          if (id.includes("node_modules/@supabase/")) return "vendor-supabase";
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

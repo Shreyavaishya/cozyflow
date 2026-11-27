@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, Lock } from 'lucide-react';
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { useStore, toDateKey } from '@/store/useStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -10,6 +9,7 @@ import ShareCardPanel from '@/components/ShareCardPanel';
 import { fmtFocus } from '@/lib/format';
 
 const WEEKS = 16;
+const WeekChart = lazy(() => import('@/components/WeekChart')); // pulls in the charting library only when Insights is opened
 
 const InsightsDialog = () => {
   const history = useStore(s => s.stats.dailyHistory);
@@ -76,14 +76,9 @@ const InsightsDialog = () => {
         <div>
           <p className="text-xs text-muted-foreground mb-2">Last 7 days (minutes)</p>
           <div className="h-36">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={week}>
-                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} />
-                <YAxis hide />
-                <Tooltip cursor={{ fill: 'transparent' }} formatter={(v: number) => [`${v} min`, 'Focus']} />
-                <Bar dataKey="minutes" radius={[6, 6, 0, 0]} fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
+            <Suspense fallback={<div className="h-full rounded-xl bg-muted/50 animate-pulse" />}>
+              <WeekChart data={week} />
+            </Suspense>
           </div>
         </div>
 

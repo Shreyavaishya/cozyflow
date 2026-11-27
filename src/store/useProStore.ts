@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { supabase } from '@/lib/supabase';
 
 interface ProState {
   isPro: boolean;
@@ -23,7 +22,10 @@ export const useProStore = create<ProState>((set) => ({
   closeUpgrade: () => set({ upgradeOpen: false }),
   setUpgradeOpen: (o) => set({ upgradeOpen: o }),
   load: async (userId) => {
-    if (!supabase || !userId) return set({ isPro: false, proUntil: null, lifetime: false, loaded: true });
+    if (!userId) return set({ isPro: false, proUntil: null, lifetime: false, loaded: true });
+    // Imported on demand so pages that never sign anyone in do not download the Supabase library.
+    const { supabase } = await import('@/lib/supabase');
+    if (!supabase) return set({ isPro: false, proUntil: null, lifetime: false, loaded: true });
     const { data } = await supabase.from('subscriptions').select('pro_until, lifetime').eq('user_id', userId).maybeSingle();
     const lifetime = !!data?.lifetime;
     const active = lifetime || (!!data?.pro_until && new Date(data.pro_until) > new Date());

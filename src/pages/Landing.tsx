@@ -6,11 +6,11 @@ import {
 } from 'lucide-react';
 import SceneBackground from '@/components/SceneBackground';
 import { useStore } from '@/store/useStore';
-import { supabase } from '@/lib/supabase';
 import { PLANS, PRO_FEATURES } from '@/lib/plans';
 import { SCENES } from '@/lib/scenes';
 import { SITE_URL } from '@/lib/site';
 import SocialProof from '@/components/SocialProof';
+import { loadApp } from '@/lib/routes';
 import InstallButton from '@/components/InstallButton';
 
 const NAV = [
@@ -210,18 +210,29 @@ const Landing = () => {
   }, []);
 
   // Magic-link and Google sign-in return to "/": once the session is set, continue into the app.
+  // The Supabase library is only downloaded when someone is actually returning from signing in.
   useEffect(() => {
-    if (!supabase) return;
     const returning = window.location.hash.includes('access_token') || window.location.search.includes('code=');
     if (!returning) return;
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) navigate('/app', { replace: true });
+    let cancelled = false;
+    let unsubscribe = () => {};
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (cancelled || !supabase) return;
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) navigate('/app', { replace: true });
+      });
+      unsubscribe = () => data.subscription.unsubscribe();
     });
-    return () => data.subscription.unsubscribe();
+    return () => { cancelled = true; unsubscribe(); };
   }, [navigate]);
 
+  // Start downloading the app the moment someone points at, focuses or touches an "open app" link.
+  const warmApp = (e: React.SyntheticEvent) => {
+    if ((e.target as HTMLElement).closest?.('a[href^="/app"]')) void loadApp();
+  };
+
   return (
-    <div className="relative min-h-screen text-foreground">
+    <div className="relative min-h-screen text-foreground" onPointerOver={warmApp} onFocus={warmApp} onTouchStart={warmApp}>
       <SceneBackground />
       <Navbar />
 
@@ -370,7 +381,8 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 md:items-start md:justify-between">
           <div className="max-w-xs">
             <p className="font-serif text-lg font-semibold">🍅 Cozy Flow</p>
-            <p className="mt-2 text-sm text-muted-foreground">
+            
+<p className="mt-2 text-sm text-muted-foreground">
               A calm Pomodoro timer, made with ❤️ by{" "}
             <a
               href="https://shreyacodes.in"
@@ -396,21 +408,19 @@ const Landing = () => {
               <Link to="/sponsor" className="text-muted-foreground hover:text-foreground">Sponsor us</Link>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="font-medium">Legal</span>
-              <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
-              <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
-              <Link to="/refund" className="text-muted-foreground hover:text-foreground">Refunds</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-xs text-muted-foreground pb-8">© {new Date().getFullYear()} Cozy Flow</p>
-      </footer>
-    </div>
-  );
-};
-
-export default Landing;
+            <span className="font-medium">Legal</span>
+                          <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+                          <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
+                          <Link to="/refund" className="text-muted-foreground hover:text-foreground">Refunds</Link>
+                          <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-center text-xs text-muted-foreground pb-8">© {new Date().getFullYear()} Cozy Flow</p>
+                  </footer>
+                </div>
+              );
+            };
             
-      
- 
+ export default Landing;
+            
